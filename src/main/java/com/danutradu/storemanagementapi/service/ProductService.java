@@ -7,9 +7,10 @@ import com.danutradu.storemanagementapi.mapper.ProductMapper;
 import com.danutradu.storemanagementapi.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,12 +26,13 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
     }
 
-    public List<Product> findProducts(String name) {
-        log.info("Searching products with name: {}", name);
+    public Page<Product> findProducts(String name, int pageNum, int pageSize, String sortBy) {
+        log.info("Searching products with name: {}, page: {}, size {}", name, pageNum, pageSize);
+        var pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         if (name != null && !name.isBlank()) {
-            return productRepository.findByNameContainingIgnoreCase(name);
+            return productRepository.findByNameContainingIgnoreCase(name, pageable);
         }
-        return productRepository.findAll();
+        return productRepository.findAll(pageable);
     }
 
     public Product addProduct(ProductDto productDto) {

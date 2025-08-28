@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -79,13 +81,13 @@ class ProductServiceTest {
 
     @Test
     void findProductsWithNameFiltered() {
-        var products = Arrays.asList(testProduct);
-        when(productRepository.findByNameContainingIgnoreCase("Test")).thenReturn(products);
+        when(productRepository.findByNameContainingIgnoreCase(eq("Test"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Arrays.asList(testProduct)));
 
-        var result = productService.findProducts("Test");
+        var result = productService.findProducts("Test", 0, 10, "id");
 
-        assertEquals(1, result.size());
-        assertEquals("Test Product", result.get(0).getName());
+        assertEquals(1, result.getContent().size());
+        assertEquals("Test Product", result.getContent().get(0).getName());
     }
 
     @Test

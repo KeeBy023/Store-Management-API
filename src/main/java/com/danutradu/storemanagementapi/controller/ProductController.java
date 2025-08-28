@@ -7,13 +7,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,16 +22,20 @@ import java.util.List;
 @RequestMapping("api/v1/products")
 @Tag(name = "Products", description = "Product management operations")
 @SecurityRequirement(name = "basicAuth")
+@Validated
 public class ProductController {
 
     private final ProductService productService;
 
-    @Operation(summary = "Get all products", description = "Retrieve all products or search by name")
+    @Operation(summary = "Get products with pagination", description = "Retrieve products with pagination, sorting and optional name search")
     @GetMapping
-    public ResponseEntity<List<Product>> findProducts(@RequestParam(required = false) String name) {
-        log.info("Request to find products with name: {}", name);
-        var products = productService.findProducts(name);
-        return ResponseEntity.ok(products);
+    public ResponseEntity<Page<Product>> findProducts(@RequestParam(required = false) String name,
+                                                      @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page must be non-negative") int pageNum,
+                                                      @RequestParam(defaultValue = "10") @Min(value = 1, message = "Size must be positive") int pageSize,
+                                                      @RequestParam(defaultValue = "id") String sortBy) {
+        log.info("Request to find products with name: {}, page: {}, size: {}", name, pageNum, pageSize);
+        var productPage = productService.findProducts(name, pageNum, pageSize, sortBy);
+        return ResponseEntity.ok(productPage);
     }
 
     @Operation(summary = "Get products by ID", description = "Retrieve a specific product by its ID")
