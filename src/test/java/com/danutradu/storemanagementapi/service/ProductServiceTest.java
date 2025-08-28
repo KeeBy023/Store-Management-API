@@ -2,17 +2,23 @@ package com.danutradu.storemanagementapi.service;
 
 import com.danutradu.storemanagementapi.dto.ProductDto;
 import com.danutradu.storemanagementapi.entity.Product;
+import com.danutradu.storemanagementapi.event.ProductPriceChangedEvent;
 import com.danutradu.storemanagementapi.exception.ProductNotFoundException;
 import com.danutradu.storemanagementapi.mapper.ProductMapper;
 import com.danutradu.storemanagementapi.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -32,6 +38,15 @@ class ProductServiceTest {
     @Mock
     private ProductMapper productMapper;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
+
     @InjectMocks
     private ProductService productService;
 
@@ -46,6 +61,10 @@ class ProductServiceTest {
         testProductDto.setDescription(testProduct.getDescription());
         testProductDto.setPrice(testProduct.getPrice());
         testProductDto.setQuantity(testProduct.getQuantity());
+
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("admin");
     }
 
     @Test
@@ -110,6 +129,15 @@ class ProductServiceTest {
         assertEquals(new BigDecimal("15.99"), result.getPrice());
         assertEquals(50, result.getQuantity());
         verify(productRepository).save(testProduct);
+
+        ArgumentCaptor<ProductPriceChangedEvent> eventcaptor = ArgumentCaptor.forClass(ProductPriceChangedEvent.class);
+        verify(eventPublisher).publishEvent(eventcaptor.capture());
+
+        var event = eventcaptor.getValue();
+        assertEquals(testProduct, event.product());
+        assertEquals(new BigDecimal("10.99"), event.oldPrice());
+        assertEquals(new BigDecimal("15.99"), event.newPrice());
+        assertEquals("admin", event.changedBy());
     }
 
     @Test
