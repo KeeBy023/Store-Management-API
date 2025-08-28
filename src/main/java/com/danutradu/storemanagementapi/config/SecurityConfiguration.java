@@ -29,6 +29,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "api/v1/products").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "api/v1/products/**").hasRole("ADMIN")
+                        .requestMatchers("api/v1/inventory/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
