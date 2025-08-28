@@ -36,29 +36,29 @@ HTTP Basic Authentication with predefined users:
 
 ### Product Management
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/products` | USER/ADMIN | List products with pagination and search |
-| `GET` | `/api/products/{id}` | USER/ADMIN | Get specific product details |
-| `POST` | `/api/products` | ADMIN | Create new product |
-| `PATCH` | `/api/products/{id}` | ADMIN | Update product fields |
-| `DELETE` | `/api/products/{id}` | ADMIN | Remove product |
-| `GET` | `/api/products/{id}/price-history` | USER/ADMIN | View price change history |
+| Method | Endpoint                              | Auth | Description |
+|--------|---------------------------------------|------|-------------|
+| `GET` | `/api/v1/products`                    | USER/ADMIN | List products with pagination and search |
+| `GET` | `/api/v1/products/{id}`               | USER/ADMIN | Get specific product details |
+| `POST` | `/api/v1/products`                    | ADMIN | Create new product |
+| `PATCH` | `/api/v1/products/{id}`               | ADMIN | Update product fields |
+| `DELETE` | `/api/v1/products/{id}`               | ADMIN | Remove product |
+| `GET` | `/api/v1/products/{id}/price-history` | USER/ADMIN | View price change history |
 
 ### Inventory Operations
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/inventory/low-stock` | ADMIN | Find products below threshold |
-| `GET` | `/api/inventory/out-of-stock` | ADMIN | Find products with zero stock |
-| `POST` | `/api/inventory/{id}/adjust` | ADMIN | Adjust stock with reason |
-| `POST` | `/api/inventory/{id}/restock` | ADMIN | Add inventory |
-| `POST` | `/api/inventory/{id}/reserve` | ADMIN | Reserve stock for orders |
+| Method | Endpoint                         | Auth | Description |
+|--------|----------------------------------|------|-------------|
+| `GET` | `/api/v1/inventory/low-stock`    | ADMIN | Find products below threshold |
+| `GET` | `/api/v1/inventory/out-of-stock` | ADMIN | Find products with zero stock |
+| `POST` | `/api/v1/inventory/{id}/adjust`  | ADMIN | Adjust stock with reason |
+| `POST` | `/api/v1/inventory/{id}/restock` | ADMIN | Add inventory |
+| `POST` | `/api/v1/inventory/{id}/reserve` | ADMIN | Reserve stock for orders |
 
 ## 🏗️ Architecture
 
 ### Technology Stack
-- **Framework**: Spring Boot 3.x
+- **Framework**: Spring Boot 3.5.5
 - **Security**: Spring Security with HTTP Basic Auth
 - **Database**: H2 (in-memory)
 - **Documentation**: OpenAPI 3 / Swagger
