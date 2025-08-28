@@ -19,6 +19,7 @@ This API provides a complete solution for store management with:
 
 - **Product Catalog Management** - Full CRUD operations with search and pagination
 - **Inventory Control** - Real-time stock tracking, adjustments, and alerts
+- **Price History Auditing** - Automatic tracking of all price changes
 - **Role-Based Security** - Admin and user access levels
 - **Business Logic Validation** - Prevents invalid operations like negative inventory
 
@@ -42,6 +43,7 @@ HTTP Basic Authentication with predefined users:
 | `POST` | `/api/products` | ADMIN | Create new product |
 | `PATCH` | `/api/products/{id}` | ADMIN | Update product fields |
 | `DELETE` | `/api/products/{id}` | ADMIN | Remove product |
+| `GET` | `/api/products/{id}/price-history` | USER/ADMIN | View price change history |
 
 ### Inventory Operations
 
@@ -64,7 +66,9 @@ HTTP Basic Authentication with predefined users:
 - **Build**: Maven
 
 ### Key Features
-- **Transactional Safety**: Inventory updates are atomic
+- **Event-Driven Architecture**: Uses Spring events for loose coupling
+- **Transactional Safety**: Price changes and inventory updates are atomic
+- **Audit Trail**: Complete history of price changes with user tracking
 - **Input Validation**: Comprehensive validation with meaningful error messages
 - **Exception Handling**: Global error handling with proper HTTP status codes
 - **Pagination**: All list endpoints support pagination and sorting
@@ -85,11 +89,13 @@ Interactive API documentation available at:
 
 ### Schema
 - `products` - Product catalog with pricing and inventory
+- `price_history` - Audit trail of all price changes
 
 ## 🚦 Business Rules
 
 - **Inventory**: Cannot go below zero
 - **Prices**: Must be positive values
+- **Price History**: Automatically recorded on product creation and any price change with user tracking
 - **Validation**: Comprehensive input validation on all endpoints
 
 ## 📈 Future Enhancements
