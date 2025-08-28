@@ -1,7 +1,9 @@
 package com.danutradu.storemanagementapi.controller;
 
 import com.danutradu.storemanagementapi.dto.ProductDto;
+import com.danutradu.storemanagementapi.entity.PriceHistory;
 import com.danutradu.storemanagementapi.entity.Product;
+import com.danutradu.storemanagementapi.service.PriceHistoryService;
 import com.danutradu.storemanagementapi.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     private final ProductService productService;
+    private final PriceHistoryService priceHistoryService;
 
     @Operation(summary = "Get products with pagination", description = "Retrieve products with pagination, sorting and optional name search")
     @GetMapping
@@ -68,5 +73,13 @@ public class ProductController {
         log.info("Request to delete product with id: {}", id);
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get product price history", description = "Retrieve price change history for a product")
+    @GetMapping("/{id}/price-history")
+    public ResponseEntity<List<PriceHistory>> getPriceHistory(@PathVariable Long id) {
+        log.info("Request to get price history for product: {}", id);
+        var history = priceHistoryService.getPriceHistory(id);
+        return ResponseEntity.ok(history);
     }
 }
