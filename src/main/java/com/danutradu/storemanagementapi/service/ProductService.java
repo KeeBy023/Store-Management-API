@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -40,10 +42,15 @@ public class ProductService {
         return productRepository.findAll(pageable);
     }
 
+    @Transactional
     public Product addProduct(ProductDto productDto) {
         log.info("Adding new product: {}", productDto.getName());
         var product = productMapper.toEntity(productDto);
-        return productRepository.save(product);
+        var savedProduct = productRepository.save(product);
+
+        var currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        eventPublisher.publishEvent(new ProductPriceChangedEvent(savedProduct, BigDecimal.ZERO, productDto.getPrice(), currentUser));
+        return savedProduct;
     }
 
     @Transactional
