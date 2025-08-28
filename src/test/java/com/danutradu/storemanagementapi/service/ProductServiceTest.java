@@ -61,14 +61,13 @@ class ProductServiceTest {
         testProductDto.setDescription(testProduct.getDescription());
         testProductDto.setPrice(testProduct.getPrice());
         testProductDto.setQuantity(testProduct.getQuantity());
-
-        SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn("admin");
     }
 
     @Test
     void addProductSuccessfully() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("admin");
         when(productMapper.toEntity(testProductDto)).thenReturn(testProduct);
         when(productRepository.save(any(Product.class))).thenReturn(testProduct);
 
@@ -115,6 +114,9 @@ class ProductServiceTest {
         updates.setPrice(new BigDecimal("15.99"));
         updates.setQuantity(50);
 
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("admin");
         when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
         doAnswer(invocation -> {
             Product product = invocation.getArgument(1);
@@ -130,10 +132,10 @@ class ProductServiceTest {
         assertEquals(50, result.getQuantity());
         verify(productRepository).save(testProduct);
 
-        ArgumentCaptor<ProductPriceChangedEvent> eventcaptor = ArgumentCaptor.forClass(ProductPriceChangedEvent.class);
-        verify(eventPublisher).publishEvent(eventcaptor.capture());
+        var eventCaptor = ArgumentCaptor.forClass(ProductPriceChangedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
 
-        var event = eventcaptor.getValue();
+        var event = eventCaptor.getValue();
         assertEquals(testProduct, event.product());
         assertEquals(new BigDecimal("10.99"), event.oldPrice());
         assertEquals(new BigDecimal("15.99"), event.newPrice());
